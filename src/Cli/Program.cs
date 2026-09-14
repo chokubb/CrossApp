@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Encodings.Web;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -27,8 +28,14 @@ var info = new
 
 if (args.Contains("--json"))
 {
-    Console.WriteLine(JsonSerializer.Serialize(info));
+    var options = new JsonSerializerOptions
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    Console.WriteLine(JsonSerializer.Serialize(info, options));
 }
+
 else
 {
     Console.WriteLine(info.Title);
