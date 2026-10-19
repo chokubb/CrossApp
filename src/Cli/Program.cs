@@ -1,31 +1,37 @@
-﻿using Core;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
+﻿using Core.Dto;
+using Core.Import;
 
-Console.OutputEncoding = Encoding.UTF8;
+string path = args.Length > 0
+    ? args[0]
+    : Path.Combine("data", "sample.csv");
 
-EnvironmentReport report = EnvironmentInfo.Collect();
-
-if (args.Contains("--json"))
+if (!File.Exists(path))
 {
-    var options = new JsonSerializerOptions
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-    };
-
-    Console.WriteLine(JsonSerializer.Serialize(report, options));
-    return;
+    Console.WriteLine($"Файл не знайдено: {Path.GetFullPath(path)}");
+    return 1;
 }
 
-Console.WriteLine("CrossApp – інформація про середовище");
-Console.WriteLine($"Студент: Муц Анастасія, група ФЕІ-31");
-Console.WriteLine(new string('-', 52));
+ImportResult<ProductDto> result = ProductCsvImporter.Load(path);
 
-Console.WriteLine($"ОС                : {report.OsDescription}");
-Console.WriteLine($"Runtime           : {report.FrameworkDescription}");
-Console.WriteLine($"Архітектура       : {report.ProcessArchitecture}");
-Console.WriteLine($"RID (визначено)   : {report.DetectedRid}");
-Console.WriteLine($"RID (від .NET)    : {report.ReportedRid}");
-Console.WriteLine($"Каталог           : {report.BaseDirectory}");
-Console.WriteLine($"TFM               : {report.BuildNote}");
+Console.WriteLine($"Файл: {Path.GetFullPath(path)}");
+Console.WriteLine($"Завантажено записів: {result.Items.Count}");
+Console.WriteLine();
+
+foreach (ProductDto product in result.Items.Take(5))
+{
+    Console.WriteLine(
+        $"{product.Id,-7} {product.Name,-24} {product.Price,8:F2}");
+}
+
+if (result.Errors.Count > 0)
+{
+    Console.WriteLine();
+    Console.WriteLine($"Пропущено рядків: {result.Errors.Count}");
+
+    foreach (string error in result.Errors)
+    {
+        Console.WriteLine($"! {error}");
+    }
+}
+
+return 0;
