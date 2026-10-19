@@ -56,3 +56,35 @@ dotnet run --project src/Cli -f net10.0
 | win-x64 | framework-dependent | 0,19 MB | Так, .NET 10 |
 | win-x64 | single-file self-contained | 70,15 MB | Ні |
 | win-x64 | trimmed self-contained | 19,54 MB | Ні |
+
+## Лабораторна робота 3 — імпорт даних
+
+Для представлення даних предметної області використовуються record-типи
+ProductDto, CustomerDto та OrderDto.
+
+### CSV
+
+Формат файлу:
+id;name;price;description
+
+Роздільник: `;`  
+Кодування: UTF-8  
+Числові значення обробляються з `CultureInfo.InvariantCulture`.
+
+Запуск:
+
+dotnet run --project src/Cli -f net10.0
+
+Або з указаним файлом:
+
+dotnet run --project src/Cli -f net10.0 -- data/correct.csv
+
+### JSON
+
+dotnet run --project src/Cli -f net10.0 -- data/sample.json
+
+### Різнорідні записи
+
+Префікс `P` позначає товар, `C` — клієнта.
+
+dotnet run --project src/Cli -f net10.0 -- --mixed data/mixed.csv

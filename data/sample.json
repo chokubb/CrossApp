@@ -1,0 +1,32 @@
+[
+  {
+    "id": "P-001",
+    "name": "Wireless Mouse",
+    "price": 24.90,
+    "description": "Compact wireless mouse"
+  },
+  {
+    "id": "P-002",
+    "name": "Mechanical Keyboard",
+    "price": 79.50,
+    "description": "Keyboard with mechanical switches"
+  },
+  {
+    "id": "P-003",
+    "name": "USB-C Hub",
+    "price": 39.99,
+    "description": "Six-port USB-C hub"
+  },
+  {
+    "id": "P-004",
+    "name": "Laptop Stand",
+    "price": 31.40,
+    "description": "Adjustable aluminium stand"
+  },
+  {
+    "id": "P-005",
+    "name": "Webcam",
+    "price": 54.90,
+    "description": "Full HD webcam"
+  }
+]
