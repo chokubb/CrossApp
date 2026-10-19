@@ -1,0 +1,14 @@
+id;name;price;description
+P-001;Wireless Mouse;24.90;Compact wireless mouse
+P-002;Mechanical Keyboard;79.50;Keyboard with mechanical switches
+P-003;USB-C Hub;39.99;Six-port USB-C hub
+P-004;Laptop Stand;31.40;Adjustable aluminium stand
+P-005;Webcam;54.90;Full HD webcam
+P-006;Headphones;64.75;Over-ear headphones
+P-007;Portable SSD;89.99;External 1TB SSD
+P-008;USB-C Cable;12.50;Two metre charging cable
+P-009;Monitor Light;42.30;LED monitor light bar
+P-010;Desk Microphone;69.00;USB condenser microphone
+P-011;Power Bank;45.90
+P-012;;29.90;Product without a name
+P-013;Bluetooth Speaker;not-a-price;Invalid price value

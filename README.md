@@ -52,7 +52,7 @@ dotnet run --project src/Cli -f net10.0
 
 | RID | Режим | Розмір | Потрібен встановлений runtime |
 |---|---|---:|---|
-| win-x64 | self-contained | ___ MB | Ні |
-| win-x64 | framework-dependent | ___ MB | Так, .NET 10 |
-| win-x64 | single-file self-contained | ___ MB | Ні |
-| win-x64 | trimmed self-contained | ___ MB | Ні |
+| win-x64 | self-contained | 76,85 MB | Ні |
+| win-x64 | framework-dependent | 0,19 MB | Так, .NET 10 |
+| win-x64 | single-file self-contained | 70,15 MB | Ні |
+| win-x64 | trimmed self-contained | 19,54 MB | Ні |
