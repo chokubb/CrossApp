@@ -143,3 +143,55 @@ FromDto використовує ті самі перевірки, що і Creat
 ### Запуск демонстрації
 
 dotnet run --project src/Cli -f net10.0
+
+## Лабораторна робота 5 — Сервісний шар
+
+Предметна область: Замовлення.
+
+### Архітектура
+
+У Core/Abstractions створено інтерфейс IOrderStore.
+
+Методи інтерфейсу:
+- List() — отримати всі замовлення;
+- GetById() — знайти замовлення за ID;
+- Add() — додати замовлення;
+- Update() — оновити замовлення;
+- Remove() — видалити замовлення.
+
+Реалізовано два сховища:
+- InMemoryOrderStore — зберігання в оперативній пам'яті;
+- FileOrderStore — зберігання у JSON-файлі.
+
+OrderService залежить тільки від IOrderStore.
+Залежність передається через конструктор без DI-контейнера.
+
+### Файлове сховище
+
+Файл: data/orders-lab05.json
+
+Для збереження використовується OrderDto.
+Перетворення здійснюється через ToDto() і FromDto().
+
+### Додаткові завдання
+
+1. CachingOrderStore — декоратор із кешуванням.
+2. OrderService.Search(Func<Order, bool>) —
+   пошук за довільною умовою.
+3. StoreFactory — фабрика для вибору сховища.
+
+### Команди запуску
+
+dotnet run --project src/Cli -f net10.0
+
+dotnet run --project src/Cli -f net10.0 -- --file
+
+dotnet run --project src/Cli -f net10.0 -- --cache
+
+dotnet run --project src/Cli -f net10.0 -- --file --cache
+
+### Git
+
+Коміти лабораторної №5:
+- lab05: add order service and storage implementations
+- lab05: add manual DI demo and optional tasks
