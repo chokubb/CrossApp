@@ -1,0 +1,26 @@
+[
+  {
+    "Id": "P-001",
+    "Name": "Wireless Mouse",
+    "Price": 24.90,
+    "Description": "Compact wireless mouse"
+  },
+  {
+    "Id": "P-002",
+    "Name": "USB-C Hub",
+    "Price": 39.99,
+    "Description": "Six-port USB-C hub"
+  },
+  {
+    "Id": "P-003",
+    "Name": "Broken Product",
+    "Price": -15.00,
+    "Description": "Invalid negative price"
+  },
+  {
+    "Id": "P-004",
+    "Name": "",
+    "Price": 20.00,
+    "Description": "Missing product name"
+  }
+]
