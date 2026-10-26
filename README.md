@@ -194,4 +194,9 @@ dotnet run --project src/Cli -f net10.0 -- --file --cache
 
 Коміти лабораторної №5:
 - lab05: add order service and storage implementations
+Основний сервісний шар і дві реалізації сховища:
+   [d7a3a97](https://github.com/chokubb/CrossApp/commit/d7a3a97)
+
 - lab05: add manual DI demo and optional tasks
+Ручний DI, демонстрація та всі додаткові завдання:
+   [42e7b64](https://github.com/chokubb/CrossApp/commit/42e7b64)
