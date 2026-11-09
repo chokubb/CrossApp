@@ -200,3 +200,61 @@ dotnet run --project src/Cli -f net10.0 -- --file --cache
 - lab05: add manual DI demo and optional tasks
 Ручний DI, демонстрація та всі додаткові завдання:
    [42e7b64](https://github.com/chokubb/CrossApp/commit/42e7b64)
+
+   ## Лабораторна робота 6 — Доменні події та делегати
+
+Предметна область: Замовлення.
+
+### Основна реалізація
+
+У Core/Events створено:
+- OrderChangeKind — перелік видів змін;
+- OrderChangedEventArgs — інформація про зміну замовлення.
+
+У OrderService додано подію Changed.
+Після успішної зміни замовлення викликається OnChanged().
+
+Події:
+- OrderCreated — створення замовлення;
+- LineAdded — додавання товару;
+- OrderConfirmed — підтвердження;
+- OrderCancelled — скасування;
+- OrderRemoved — видалення.
+
+Обробники подій розташовані у Cli.
+Перший виводить повідомлення в консоль і logs/app.log.
+Другий використовує лямбду для підрахунку подій.
+
+Продемонстровано підписку +=, відписку -=,
+відсутність подій після невдалих операцій
+та пошук через FindAll(Func<Order, bool>).
+
+### Додаткові завдання
+
+1. INotificationSink з реалізаціями ConsoleSink і FileSink.
+   Обидва обробники передаються OrderService через конструктор.
+
+2. Action<string> у ProductCsvImporter.Load().
+   Використовується для повідомлення про пропущені рядки CSV.
+
+### Запуск
+
+Лабораторна №6:
+
+dotnet run --project src/Cli -f net10.0
+
+Лабораторна №6 із файловим сховищем:
+
+dotnet run --project src/Cli -f net10.0 -- --file
+
+Попередня лабораторна №5:
+
+dotnet run --project src/Cli -f net10.0 -- --lab05
+
+### Логи
+
+Основний журнал: logs/app.log
+Додатковий журнал: logs/sinks.log
+
+Обидва журнали створюються в каталозі застосунку
+src/Cli/bin/Debug/net10.0/logs під час запуску.

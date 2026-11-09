@@ -8,7 +8,9 @@ public static class ProductCsvImporter
 {
     private const char Separator = ';';
 
-    public static ImportResult<ProductDto> Load(string path)
+    public static ImportResult<ProductDto> Load(
+        string path,
+        Action<string>? onSkipped = null)
     {
         var items = new List<ProductDto>();
         var errors = new List<string>();
@@ -20,12 +22,19 @@ public static class ProductCsvImporter
             int number = i + 1;
             string line = lines[i];
 
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#'))
+            if (string.IsNullOrWhiteSpace(line) ||
+                line.StartsWith('#'))
+            {
                 continue;
+            }
 
             if (number == 1 &&
-                line.StartsWith("id", StringComparison.OrdinalIgnoreCase))
+                line.StartsWith(
+                    "id",
+                    StringComparison.OrdinalIgnoreCase))
+            {
                 continue;
+            }
 
             switch (ParseLine(line))
             {
@@ -34,8 +43,16 @@ public static class ProductCsvImporter
                     break;
 
                 case ParseFailed failed:
-                    errors.Add($"рядок {number}: {failed.Reason}");
+                {
+                    string message =
+                        $"рядок {number}: {failed.Reason}";
+
+                    errors.Add(message);
+
+                    onSkipped?.Invoke(message);
+
                     break;
+                }
             }
         }
 
@@ -44,8 +61,9 @@ public static class ProductCsvImporter
 
     private static ParseOutcome ParseLine(string line)
     {
-        string[] parts =
-            line.Split(Separator, StringSplitOptions.TrimEntries);
+        string[] parts = line.Split(
+            Separator,
+            StringSplitOptions.TrimEntries);
 
         return parts switch
         {

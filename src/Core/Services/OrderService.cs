@@ -1,16 +1,41 @@
 using Core.Abstractions;
 using Core.Domain;
+using Core.Events;
 
 namespace Core.Services;
 
 public sealed class OrderService
 {
     private readonly IOrderStore _store;
+    private readonly IReadOnlyList<INotificationSink> _sinks;
 
-    public OrderService(IOrderStore store)
+    public OrderService(
+        IOrderStore store,
+        params INotificationSink[] sinks)
     {
         _store = store
             ?? throw new ArgumentNullException(nameof(store));
+
+        _sinks = sinks
+            ?? throw new ArgumentNullException(nameof(sinks));
+    }
+
+    public event EventHandler<OrderChangedEventArgs>? Changed;
+
+    private void OnChanged(Order order, OrderChangeKind kind)
+    {
+        var e = new OrderChangedEventArgs(
+            order.Id,
+            kind,
+            order.Lines.Count,
+            order.Total);
+
+        Changed?.Invoke(this, e);
+
+        foreach (INotificationSink sink in _sinks)
+        {
+            sink.Notify(e);
+        }
     }
 
     public Order CreateOrder(
@@ -20,6 +45,8 @@ public sealed class OrderService
         Order order = Order.Create(customerId, id);
 
         _store.Add(order);
+
+        OnChanged(order, OrderChangeKind.OrderCreated);
 
         return order;
     }
@@ -40,6 +67,8 @@ public sealed class OrderService
             quantity);
 
         _store.Update(order);
+
+        OnChanged(order, OrderChangeKind.LineAdded);
     }
 
     public void Confirm(string orderId)
@@ -49,6 +78,8 @@ public sealed class OrderService
         order.Confirm();
 
         _store.Update(order);
+
+        OnChanged(order, OrderChangeKind.OrderConfirmed);
     }
 
     public void Cancel(string orderId)
@@ -58,6 +89,8 @@ public sealed class OrderService
         order.Cancel();
 
         _store.Update(order);
+
+        OnChanged(order, OrderChangeKind.OrderCancelled);
     }
 
     public IReadOnlyList<Order> All()
@@ -72,7 +105,19 @@ public sealed class OrderService
 
     public bool Remove(string id)
     {
-        return _store.Remove(id);
+        Order? order = _store.GetById(id);
+
+        if (order is null)
+            return false;
+
+        bool removed = _store.Remove(id);
+
+        if (removed)
+        {
+            OnChanged(order, OrderChangeKind.OrderRemoved);
+        }
+
+        return removed;
     }
 
     public IReadOnlyList<Order> Search(
@@ -84,6 +129,12 @@ public sealed class OrderService
             .Where(predicate)
             .ToList()
             .AsReadOnly();
+    }
+
+    public IReadOnlyList<Order> FindAll(
+        Func<Order, bool> predicate)
+    {
+        return Search(predicate);
     }
 
     private Order GetRequired(string id)
