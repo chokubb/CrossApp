@@ -247,10 +247,6 @@ dotnet run --project src/Cli -f net10.0
 
 dotnet run --project src/Cli -f net10.0 -- --file
 
-Попередня лабораторна №5:
-
-dotnet run --project src/Cli -f net10.0 -- --lab05
-
 ### Логи
 
 Основний журнал: logs/app.log
@@ -258,3 +254,21 @@ dotnet run --project src/Cli -f net10.0 -- --lab05
 
 Обидва журнали створюються в каталозі застосунку
 src/Cli/bin/Debug/net10.0/logs під час запуску.
+
+## Перегляд попередніх лабораторних
+
+Актуальна версія проєкту запускає лабораторну №6.
+
+Попередні лабораторні доступні через історію Git.
+
+### Лабораторна №5
+
+git switch --detach a9c6d61
+dotnet run --project src/Cli -f net10.0
+
+### Повернення до актуальної версії
+
+git switch main
+
+Перед перемиканням потрібно зберегти або закомітити
+всі локальні зміни.
