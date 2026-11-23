@@ -30,31 +30,10 @@
 dotnet build
 ```
 
-## Запуск актуальної версії — лабораторна №6
+## Запуск лабораторної №6
 
-Звичайний запуск:
-
-```powershell
-dotnet run --project src/Cli -f net10.0
-```
-
-Файлове сховище:
-
-```powershell
-dotnet run --project src/Cli -f net10.0 -- --file
-```
-
-Кешування:
-
-```powershell
-dotnet run --project src/Cli -f net10.0 -- --cache
-```
-
-Файлове сховище з кешуванням:
-
-```powershell
-dotnet run --project src/Cli -f net10.0 -- --file --cache
-```
+Для запуску цієї демонстрації потрібно перейти
+до відповідного коміту з історії Git.
 
 ## Доменна модель
 
@@ -151,6 +130,101 @@ git switch main
 
 Перед перемиканням необхідно зберегти або
 закомітити локальні зміни.
+
+
+## Лабораторна робота 7 — LINQ-звіти
+
+Предметна область: замовлення інтернет-магазину.
+
+### Реалізація
+
+У Core/Reports створено ReportService і DTO для звітів.
+
+Реалізовано:
+- TopCustomers — топ клієнтів за сумою замовлень;
+- HighValueOrders — замовлення дорожчі за задану суму;
+- TopOrders — найбільші замовлення;
+- ByStatus — групування за статусом;
+- ByMonth — групування за місяцем;
+- Totals — кількість, сума, середній чек і максимум.
+
+Для запитів використовуються Where, Select, GroupBy,
+OrderBy, OrderByDescending, ThenBy, Take, Sum,
+Average, Max і Count.
+
+Методи звітів приймають IEnumerable<Order> та
+повертають DTO. Загальні підсумки повертаються
+іменованим кортежем.
+
+Для Top-N використовується додаткове сортування
+за ID, щоб порядок результатів був стабільним.
+
+Порожня колекція обробляється без винятків.
+
+SampleData містить 18 замовлень із різними
+статусами, сумами та місяцями створення.
+
+### Команди
+
+```powershell
+dotnet run --project src/Cli -f net10.0 -- report-top
+dotnet run --project src/Cli -f net10.0 -- report-high
+dotnet run --project src/Cli -f net10.0 -- report-groups
+dotnet run --project src/Cli -f net10.0 -- report-months
+dotnet run --project src/Cli -f net10.0 -- report-sum
+dotnet run --project src/Cli -f net10.0 -- report-orders-top
+dotnet run --project src/Cli -f net10.0 -- report-deferred
+dotnet run --project src/Cli -f net10.0 -- report-empty
+```
+
+Без указаної команди запускається report-top.
+
+### Відкладене виконання LINQ
+
+Метод DeferredHighValue створює запит Where/Select,
+але не викликає ToList(), тому обробка відкладається.
+
+Перший Count() виконує запит над початковим списком.
+Після додавання ще одного відповідного замовлення
+другий Count() повертає число на одиницю більше.
+
+Після виклику ToList() створюється окремий знімок
+результату. Подальше очищення вихідного списку
+вже не змінює цей знімок.
+
+### Додаткові завдання
+
+1. GroupJoin — об'єднання клієнтів та їхніх
+   замовлень у CustomerOrderSummary.
+
+2. TopBy — власний метод-розширення для
+   вибору N елементів із найбільшими показниками.
+   Використаний у TopCustomers і TopOrders.
+
+3. ByStatusQuery — групування через синтаксис
+   запитів from/group/into/orderby/select.
+   Порівняно з методним синтаксисом у ByStatus.
+   Методний синтаксис зручний для коротких
+   послідовних операцій, а синтаксис запитів
+   може бути наочнішим для групування.
+
+4. BenchmarkTop — порівняння часу LINQ-запитів
+   на 100 000 записах за допомогою Stopwatch.
+   Порівнюються варіанти з проміжним ToList()
+   і без нього. Час вимірюється окремо
+   від створення тестових даних.
+
+### Команди додаткових завдань
+
+```powershell
+dotnet run --project src/Cli -f net10.0 -- report-join
+dotnet run --project src/Cli -f net10.0 -- report-orders-top
+dotnet run --project src/Cli -f net10.0 -- report-query
+dotnet run --project src/Cli -f net10.0 -- report-benchmark
+```
+
+Усі LINQ-запити звітів розташовані в Core.
+Cli відповідає за вибір команди та виведення результатів.
 
 ## Репозиторій
 

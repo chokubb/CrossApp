@@ -5,4 +5,4 @@ IOrderStore store = StoreFactory.Create(args);
 
 OrderService service = new OrderService(store);
 
-return OrderEventsDemo.Run(service);
+return OrderReportsDemo.Run(service, args);

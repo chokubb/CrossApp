@@ -8,14 +8,17 @@ public static class SampleData
     {
         var orders = new List<Order>();
 
-        for (int i = 1; i <= 15; i++)
+        DateTime startDate = new DateTime(
+            2026, 7, 1, 12, 0, 0,
+            DateTimeKind.Utc);
+
+        for (int i = 1; i <= 18; i++)
         {
             string customerId = $"C-{(i % 4) + 1:000}";
             string orderId = $"O-SEED-{i:000}";
 
-            DateTime createdAt = new DateTime(
-                2026, 10, 1, 12, 0, 0,
-                DateTimeKind.Utc).AddDays(i);
+            DateTime createdAt =
+                startDate.AddDays((i - 1) * 6);
 
             Order order = Order.Create(
                 customerId,
@@ -41,5 +44,18 @@ public static class SampleData
         }
 
         return orders;
+    }
+
+    // Для додаткового №1, п'ятий клієнт без замовлень.
+    public static IReadOnlyList<Customer> Customers()
+    {
+        return new List<Customer>
+        {
+            Customer.Create("C-001", "Alice Brown"),
+            Customer.Create("C-002", "Mark Wilson"),
+            Customer.Create("C-003", "Emma Clark"),
+            Customer.Create("C-004", "John Smith"),
+            Customer.Create("C-005", "Olivia Davis")
+        };
     }
 }
