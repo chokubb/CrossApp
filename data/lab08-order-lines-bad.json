@@ -1,0 +1,14 @@
+[
+  {
+    "ProductId": "P-201",
+    "Name": "Keyboard",
+    "Price": 120.00,
+    "Quantity": 1
+  },
+  {
+    "ProductId": "P-202",
+    "Name": "Broken Item",
+    "Price": 25.00,
+    "Quantity": 0
+  }
+]

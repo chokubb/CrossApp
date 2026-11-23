@@ -226,6 +226,120 @@ dotnet run --project src/Cli -f net10.0 -- report-benchmark
 Усі LINQ-запити звітів розташовані в Core.
 Cli відповідає за вибір команди та виведення результатів.
 
+
+## Лабораторна робота 8 — async/await, скасування та unit-тести
+
+Предметна область: замовлення.
+
+### Асинхронний імпорт
+
+Реалізовано інтерфейс IOrderLineImporter та клас
+JsonOrderLineImporter для читання товарних позицій із JSON.
+
+LoadAsync() використовує FileStream(useAsync: true)
+і JsonSerializer.DeserializeAsync із CancellationToken.
+
+OrderService.ImportAsync() додає позиції до замовлення,
+використовуючи наявний метод AddLine() та його інваріанти.
+
+Подія LineAdded виникає після кожного успішного додавання.
+
+Повторний імпорт позицій з однаковими ProductId
+не створює дублікатів у межах одного замовлення.
+
+### Скасування
+
+У Cli використано CancellationTokenSource.
+
+Скасування підтримується через:
+- Ctrl+C;
+- таймаут;
+- заздалегідь скасований токен.
+
+Токен передається від Cli до OrderService,
+а звідти до JsonOrderLineImporter.
+
+OperationCanceledException обробляється окремо
+від доменних і технічних помилок.
+
+Потоковий імпорт може залишити вже додані позиції,
+якщо скасування відбудеться посеред обробки.
+Транзакційного відкату в цій лабораторній немає.
+
+### Винятки
+
+DomainException використовується для порушень
+правил замовлення та некоректних імпортованих даних.
+
+ArgumentException і ArgumentOutOfRangeException
+залишаються для неправильних аргументів методів.
+
+FileNotFoundException, IOException і JsonException
+обробляються як технічні помилки.
+
+### Unit-тести
+
+Створено окремий проєкт tests/Core.Tests,
+який має посилання на Core, але не залежить від Cli.
+
+Тести перевіряють:
+- інваріанти замовлення;
+- незмінність стану після відмови;
+- одноразове виникнення події;
+- LINQ-звіти та стабільне сортування;
+- асинхронний імпорт;
+- правильну суму замовлення;
+- потоковий імпорт;
+- скасування;
+- доменні винятки.
+
+Тестові дані незалежні від SampleData.
+
+Запуск:
+
+```powershell
+dotnet test
+```
+
+### Команди імпорту
+
+```powershell
+dotnet run --project src/Cli -f net10.0 -- import
+dotnet run --project src/Cli -f net10.0 -- import-stream
+dotnet run --project src/Cli -f net10.0 -- import-bad
+dotnet run --project src/Cli -f net10.0 -- import-closed
+dotnet run --project src/Cli -f net10.0 -- import-timeout
+dotnet run --project src/Cli -f net10.0 -- import-wait
+```
+
+### Додаткові завдання
+
+1. Потоковий імпорт через IAsyncEnumerable та await foreach.
+
+2. Зв'язані CancellationTokenSource і тест,
+   який перевіряє скасування саме таймаутом.
+
+3. IProgress<int> для відображення відсотків
+   виконання звичайного імпорту.
+
+4. Вимірювання покриття Core unit-тестами.
+
+Команда покриття:
+
+```powershell
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+Результат формується у coverage.cobertura.xml.
+
+### Попередні лабораторні
+
+LINQ-звіти з лабораторної №7 залишаються доступними
+через підкоманди report-top, report-groups, report-sum
+та інші.
+
+Історичні версії лабораторних також збережені в Git.
+
 ## Репозиторій
 
 https://github.com/chokubb/CrossApp

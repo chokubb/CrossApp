@@ -69,7 +69,7 @@ public sealed class Order
         int quantity)
     {
         if (_status != OrderStatus.Draft)
-            throw new InvalidOperationException(
+            throw new DomainException(
                 $"Не можна додати товар: замовлення {Id} " +
                 $"має стан {_status}");
 
@@ -85,12 +85,12 @@ public sealed class Order
     public void Confirm()
     {
         if (_status != OrderStatus.Draft)
-            throw new InvalidOperationException(
+            throw new DomainException(
                 $"Замовлення {Id} не можна підтвердити " +
                 $"зі стану {_status}");
 
         if (_lines.Count == 0)
-            throw new InvalidOperationException(
+            throw new DomainException(
                 $"Не можна підтвердити порожнє замовлення {Id}");
 
         ChangeStatus(OrderStatus.Confirmed);
@@ -111,7 +111,7 @@ public sealed class Order
             (OrderStatus.Draft, OrderStatus.Cancelled)
                 => OrderStatus.Cancelled,
 
-            _ => throw new InvalidOperationException(
+            _ => throw new DomainException(
                 $"Перехід замовлення {Id} зі стану " +
                 $"{_status} до {nextStatus} заборонено")
         };

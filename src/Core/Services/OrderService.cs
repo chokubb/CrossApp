@@ -1,5 +1,6 @@
 using Core.Abstractions;
 using Core.Domain;
+using Core.Dto;
 using Core.Events;
 
 namespace Core.Services;
@@ -135,6 +136,133 @@ public sealed class OrderService
         Func<Order, bool> predicate)
     {
         return Search(predicate);
+    }
+
+    // Основне завдання: асинхронний імпорт.
+    public async Task<int> ImportAsync(
+        IOrderLineImporter importer,
+        string orderId,
+        string path,
+        CancellationToken ct = default,
+        IProgress<int>? progress = null)
+    {
+        ArgumentNullException.ThrowIfNull(importer);
+
+        ct.ThrowIfCancellationRequested();
+
+        Order order = GetRequired(orderId);
+
+        EnsureDraft(order);
+
+        IReadOnlyList<OrderLineDto> lines =
+            await importer.LoadAsync(path, ct);
+
+        ct.ThrowIfCancellationRequested();
+
+        int added = 0;
+
+        for (int i = 0; i < lines.Count; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            OrderLineDto line = lines[i];
+
+            if (!ContainsProduct(order, line.ProductId))
+            {
+                AddLine(
+                    orderId,
+                    line.ProductId,
+                    line.Name,
+                    line.Price,
+                    line.Quantity);
+
+                added++;
+            }
+
+            if (lines.Count > 0)
+            {
+                int percent =
+                    (int)((i + 1) * 100L / lines.Count);
+
+                progress?.Report(percent);
+            }
+        }
+
+        if (lines.Count == 0)
+        {
+            progress?.Report(100);
+        }
+
+        return added;
+    }
+
+    // Додаткове №1: потоковий імпорт.
+    public async Task<int> ImportStreamAsync(
+        IOrderLineImporter importer,
+        string orderId,
+        string path,
+        CancellationToken ct = default,
+        IProgress<int>? progress = null)
+    {
+        ArgumentNullException.ThrowIfNull(importer);
+
+        ct.ThrowIfCancellationRequested();
+
+        Order order = GetRequired(orderId);
+
+        EnsureDraft(order);
+
+        int added = 0;
+        int processed = 0;
+
+        await foreach (OrderLineDto line in
+            importer.StreamAsync(path, ct)
+                .WithCancellation(ct))
+        {
+            ct.ThrowIfCancellationRequested();
+
+            processed++;
+
+            if (!ContainsProduct(order, line.ProductId))
+            {
+                AddLine(
+                    orderId,
+                    line.ProductId,
+                    line.Name,
+                    line.Price,
+                    line.Quantity);
+
+                added++;
+            }
+
+            // Для потокового режиму це кількість
+            // оброблених записів, а не відсоток.
+            progress?.Report(processed);
+        }
+
+        return added;
+    }
+
+    private static void EnsureDraft(Order order)
+    {
+        if (order.Status != OrderStatus.Draft)
+        {
+            throw new DomainException(
+                $"Замовлення {order.Id} має стан " +
+                $"{order.Status}. Імпорт дозволено " +
+                "лише для чернетки.");
+        }
+    }
+
+    private static bool ContainsProduct(
+        Order order,
+        string productId)
+    {
+        return order.Lines.Any(line =>
+            string.Equals(
+                line.ProductId,
+                productId,
+                StringComparison.OrdinalIgnoreCase));
     }
 
     private Order GetRequired(string id)
